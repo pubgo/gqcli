@@ -1,0 +1,2 @@
+# gqcli
+graphquery cli
