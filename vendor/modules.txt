@@ -1,0 +1,189 @@
+# github.com/PuerkitoBio/goquery v1.5.0
+github.com/PuerkitoBio/goquery
+# github.com/RoaringBitmap/roaring v0.4.20
+github.com/RoaringBitmap/roaring
+# github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
+github.com/StackExchange/wmi
+# github.com/andybalholm/cascadia v1.0.0
+github.com/andybalholm/cascadia
+# github.com/antchfx/htmlquery v1.0.0
+github.com/antchfx/htmlquery
+# github.com/antchfx/xpath v1.0.0
+github.com/antchfx/xpath
+# github.com/couchbase/vellum v0.0.0-20190829182332-ef2e028c01fd
+github.com/couchbase/vellum
+# github.com/edsrzf/mmap-go v1.0.0
+github.com/edsrzf/mmap-go
+# github.com/fsnotify/fsnotify v1.4.7
+github.com/fsnotify/fsnotify
+# github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3
+github.com/gin-contrib/sse
+# github.com/gin-gonic/gin v1.4.0
+github.com/gin-gonic/gin
+github.com/gin-gonic/gin/binding
+github.com/gin-gonic/gin/internal/json
+github.com/gin-gonic/gin/render
+# github.com/glycerine/go-unsnap-stream v0.0.0-20181221182339-f9677308dec2
+github.com/glycerine/go-unsnap-stream
+# github.com/go-ole/go-ole v1.2.4
+github.com/go-ole/go-ole
+github.com/go-ole/go-ole/oleutil
+# github.com/go-vgo/robotgo v0.0.0-20190913150959-399bd641cacc
+github.com/go-vgo/robotgo
+github.com/go-vgo/robotgo/clipboard
+# github.com/gogs/chardet v0.0.0-20150115103509-2404f7772561
+github.com/gogs/chardet
+# github.com/golang/protobuf v1.3.1
+github.com/golang/protobuf/proto
+# github.com/golang/snappy v0.0.1
+github.com/golang/snappy
+# github.com/google/uuid v1.1.1
+github.com/google/uuid
+# github.com/hashicorp/hcl v1.0.0
+github.com/hashicorp/hcl
+github.com/hashicorp/hcl/hcl/printer
+github.com/hashicorp/hcl/hcl/ast
+github.com/hashicorp/hcl/hcl/parser
+github.com/hashicorp/hcl/hcl/token
+github.com/hashicorp/hcl/json/parser
+github.com/hashicorp/hcl/hcl/scanner
+github.com/hashicorp/hcl/hcl/strconv
+github.com/hashicorp/hcl/json/scanner
+github.com/hashicorp/hcl/json/token
+# github.com/inconshreveable/mousetrap v1.0.0
+github.com/inconshreveable/mousetrap
+# github.com/json-iterator/go v1.1.6
+github.com/json-iterator/go
+# github.com/lxn/win v0.0.0-20190910083938-ae3bd9765f46
+github.com/lxn/win
+# github.com/magiconair/properties v1.8.0
+github.com/magiconair/properties
+# github.com/mattn/go-isatty v0.0.7
+github.com/mattn/go-isatty
+# github.com/mattn/go-runewidth v0.0.4
+github.com/mattn/go-runewidth
+# github.com/mitchellh/go-homedir v1.1.0
+github.com/mitchellh/go-homedir
+# github.com/mitchellh/mapstructure v1.1.2
+github.com/mitchellh/mapstructure
+# github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+github.com/modern-go/concurrent
+# github.com/modern-go/reflect2 v1.0.1
+github.com/modern-go/reflect2
+# github.com/mschoch/smat v0.0.0-20160514031455-90eadee771ae
+github.com/mschoch/smat
+# github.com/olekukonko/tablewriter v0.0.1
+github.com/olekukonko/tablewriter
+# github.com/otiai10/gosseract v2.2.1+incompatible
+github.com/otiai10/gosseract
+# github.com/pelletier/go-toml v1.2.0
+github.com/pelletier/go-toml
+# github.com/philhofer/fwd v1.0.0
+github.com/philhofer/fwd
+# github.com/pubgo/errors v0.3.13
+github.com/pubgo/errors
+github.com/pubgo/errors/internal
+# github.com/pubgo/g v0.1.1
+github.com/pubgo/g/envs
+github.com/pubgo/g/errors
+github.com/pubgo/g/gotry
+github.com/pubgo/g/logs
+github.com/pubgo/g/pkg
+# github.com/robotn/gohook v0.0.0-20190905174353-5bea7a10cc3a
+github.com/robotn/gohook
+# github.com/robotn/xgb v0.0.0-20190912153532-2cb92d044934
+github.com/robotn/xgb/xproto
+github.com/robotn/xgb
+github.com/robotn/xgb/xinerama
+github.com/robotn/xgb/shape
+# github.com/robotn/xgbutil v0.0.0-20190912154524-c861d6f87770
+github.com/robotn/xgbutil
+github.com/robotn/xgbutil/ewmh
+github.com/robotn/xgbutil/xevent
+github.com/robotn/xgbutil/xprop
+# github.com/rs/zerolog v1.15.0
+github.com/rs/zerolog
+github.com/rs/zerolog/log
+github.com/rs/zerolog/internal/cbor
+github.com/rs/zerolog/internal/json
+# github.com/shirou/gopsutil v2.19.6+incompatible
+github.com/shirou/gopsutil/process
+github.com/shirou/gopsutil/cpu
+github.com/shirou/gopsutil/internal/common
+github.com/shirou/gopsutil/mem
+github.com/shirou/gopsutil/net
+# github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4
+github.com/shirou/w32
+# github.com/spf13/afero v1.1.2
+github.com/spf13/afero
+github.com/spf13/afero/mem
+# github.com/spf13/cast v1.3.0
+github.com/spf13/cast
+# github.com/spf13/cobra v0.0.5
+github.com/spf13/cobra
+# github.com/spf13/jwalterweatherman v1.0.0
+github.com/spf13/jwalterweatherman
+# github.com/spf13/pflag v1.0.3
+github.com/spf13/pflag
+# github.com/spf13/viper v1.4.0
+github.com/spf13/viper
+# github.com/storyicon/graphquery v0.0.0-20190317074716-6a20a75cd98f
+github.com/storyicon/graphquery
+github.com/storyicon/graphquery/kernel/pipeline
+github.com/storyicon/graphquery/kernel/selector
+github.com/storyicon/graphquery/compiler
+github.com/storyicon/graphquery/kernel
+# github.com/tidwall/gjson v1.3.2
+github.com/tidwall/gjson
+# github.com/tidwall/match v1.0.1
+github.com/tidwall/match
+# github.com/tidwall/pretty v1.0.0
+github.com/tidwall/pretty
+# github.com/tinylib/msgp v1.1.0
+github.com/tinylib/msgp/msgp
+# github.com/ugorji/go v1.1.4
+github.com/ugorji/go/codec
+# github.com/vcaesar/gops v0.0.0-20190910162627-58ac09d12a53
+github.com/vcaesar/gops
+# github.com/vcaesar/imgo v0.0.0-20190523174309-2cf5275c2a13
+github.com/vcaesar/imgo
+# github.com/willf/bitset v1.1.10
+github.com/willf/bitset
+# github.com/yanyiwu/gojieba v1.1.0
+github.com/yanyiwu/gojieba
+# github.com/yuin/charsetutil v1.0.0
+github.com/yuin/charsetutil
+# github.com/zserge/webview v0.0.0-20190123072648-16c93bcaeaeb
+github.com/zserge/webview
+# golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a
+golang.org/x/image/bmp
+# golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
+golang.org/x/net/html
+golang.org/x/net/html/charset
+golang.org/x/net/html/atom
+# golang.org/x/sys v0.0.0-20190912141932-bc967efca4b8
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2
+golang.org/x/text/transform
+golang.org/x/text/unicode/norm
+golang.org/x/text/encoding
+golang.org/x/text/encoding/charmap
+golang.org/x/text/encoding/htmlindex
+golang.org/x/text/encoding/internal/identifier
+golang.org/x/text/encoding/internal
+golang.org/x/text/encoding/japanese
+golang.org/x/text/encoding/korean
+golang.org/x/text/encoding/simplifiedchinese
+golang.org/x/text/encoding/traditionalchinese
+golang.org/x/text/encoding/unicode
+golang.org/x/text/language
+golang.org/x/text/internal/utf8internal
+golang.org/x/text/runes
+golang.org/x/text/internal/language
+golang.org/x/text/internal/language/compact
+golang.org/x/text/internal/tag
+# gopkg.in/go-playground/validator.v8 v8.18.2
+gopkg.in/go-playground/validator.v8
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
