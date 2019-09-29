@@ -12,6 +12,6 @@
 *.out
 .idea
 .env*
-./mycli
-./main
+mycli
+main
 vendor
