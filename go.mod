@@ -23,6 +23,7 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/storyicon/graphquery v0.0.0-20190317074716-6a20a75cd98f
 	github.com/tidwall/gjson v1.3.2
+	github.com/ugorji/go v1.1.7 // indirect
 	github.com/yanyiwu/gojieba v1.1.0
 	github.com/yuin/charsetutil v1.0.0 // indirect
 	github.com/zserge/webview v0.0.0-20190123072648-16c93bcaeaeb

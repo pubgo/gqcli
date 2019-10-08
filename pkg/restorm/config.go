@@ -2,11 +2,16 @@ package restorm
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/pubgo/g/envs"
 )
 
+//tbs is table info
+type tb struct {
+	ColT map[string]*converter
+}
+
 type converter struct {
-	Name      string
+	// field type
+	TpName    string
 	converter func(interface{}) interface{}
 }
 
@@ -20,10 +25,10 @@ type Config struct {
 	MaxLifetime  int    `toml:"max_lefttime" json:"max_lefttime"`
 	ShowSql      bool   `toml:"show_sql" json:"show_sql"`
 
-	db   *sqlx.DB
-	colT map[string]map[string]*converter
+	db  *sqlx.DB
+	tbs map[string]*tb
 }
 
 func init() {
-	Cfg.Debug = envs.IsDebug()
+
 }

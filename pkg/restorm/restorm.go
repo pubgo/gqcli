@@ -2,12 +2,14 @@ package restorm
 
 import (
 	"database/sql"
-	"github.com/jmoiron/sqlx"
-	"github.com/pubgo/g/errors"
-	"github.com/pubgo/schema"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/pubgo/g/errors"
+	"github.com/pubgo/schema"
 )
 
 var once sync.Once
@@ -26,22 +28,22 @@ type RestOrm struct {
 	cfg map[string]*Config
 }
 
-// colsTransfer get field type and name
+// colsTransfer get table field name and type
 func (t *RestOrm) colsTransfer(name string, cfg *Config) (err error) {
 	defer errors.RespErr(&err)
 
 	tbs, err := schema.Tables(cfg.db.DB)
-	errors.PanicM(err, "get tables error")
+	errors.PanicM(err, "get table schema error")
 
-	if cfg.colT == nil {
-		cfg.colT = make(map[string]map[string]*converter)
+	if cfg.tbs == nil {
+		cfg.tbs = make(map[string]*tb)
 	}
 
 	for name, tps := range tbs {
-		cfg.colT[name] = make(map[string]*converter)
+		cfg.tbs[name] = &tb{ColT: make(map[string]*converter)}
 		for _, f := range tps {
-			field := strings.ToLower(f.DatabaseTypeName())
-			cfg.colT[name][f.Name()] = &converter{Name: field, converter: Converter(field)}
+			fieldTp := strings.ToLower(f.DatabaseTypeName())
+			cfg.tbs[name].ColT[f.Name()] = &converter{TpName: fieldTp, converter: Converter(fieldTp)}
 		}
 	}
 	return
@@ -59,10 +61,10 @@ func (t *RestOrm) ColTs() map[string]map[string]map[string]string {
 	var dt = make(map[string]map[string]map[string]string)
 	for k, v := range t.cfg {
 		dt[k] = make(map[string]map[string]string)
-		for k1, v1 := range v.colT {
+		for k1, v1 := range v.tbs {
 			dt[k][k1] = make(map[string]string)
-			for k2, v := range v1 {
-				dt[k][k1][k2] = v.Name
+			for k2, v := range v1.ColT {
+				dt[k][k1][k2] = v.TpName
 			}
 		}
 	}
@@ -87,7 +89,6 @@ func (t *RestOrm) dbConnect(key string, conf *Config) (err error) {
 	}
 	conf.db = db
 
-	// update table fields type
 	errors.Panic(t.colsTransfer(key, conf))
 	return
 }
@@ -102,44 +103,47 @@ func (t *RestOrm) DbConfigAdd(name string, cfg *Config) {
 func (t *RestOrm) DbConfigDelete(name string) {
 	if db, ok := t.cfg[name]; ok {
 		_retryAt(time.Second, func(dur time.Duration) {
-			errors.PanicM(db.db.Close, "db(%s) close error", name)
+			errors.PanicM(db.db.Close, "db(%s) closed error", name)
 			delete(t.cfg, name)
 		})
 	}
 }
 
+// DbUpdate 更新字段和类型
 func (t *RestOrm) DbUpdate(name string) (err error) {
 	defer errors.RespErr(&err)
 
 	cfg, ok := t.cfg[name]
 	errors.PanicT(!ok, "db(%s) does not exist", name)
-
-	_retryAt(time.Second, func(dur time.Duration) {
-		errors.PanicM(t.dbConnect(name, cfg), "db(%s) update error", name)
-		t.cfg[name] = cfg
-	})
-
+	errors.Panic(t.colsTransfer(name, cfg))
+	t.cfg[name] = cfg
 	return
 }
 
-func (t *RestOrm) DbConfigUpdate(name string, cfg *Config) (err error) {
-	defer errors.RespErr(&err)
-
-	_retryAt(time.Second, func(dur time.Duration) {
-		errors.PanicM(t.dbConnect(name, cfg), "db(%s) config update error", name)
-		t.cfg[name] = cfg
-	})
-
-	return
+func (t *RestOrm) DbConfigUpdate(name string, cfg *Config) {
+	t.DbConfigDelete(name)
+	t.DbConfigAdd(name, cfg)
 }
 
-// 创建记录
+// 检查数据库名称和数据表名
+func (t *RestOrm) checkDbAndTb(dbName, tbName string) error {
+	db := t.cfg[dbName]
+	if db == nil || db.tbs[tbName] == nil {
+		return fmt.Errorf("db name or table name does not exist,(%s, %s)", dbName, tbName)
+	}
+	return nil
+}
+
+// 批量创建记录
 func (t *RestOrm) ResCreateMany(dbName, tbName string, dts ...map[string]interface{}) (err error) {
 	defer errors.RespErr(&err)
 
+	// 检查db和tb
+	errors.Panic(t.checkDbAndTb(dbName, tbName))
+
 	_db := t.cfg[dbName].db
 	_tx, err := _db.Beginx()
-	errors.Panic(err)
+	errors.PanicM(err, "db(%s) create tx error", dbName)
 
 	_sql := &sqlBuilder{table: tbName}
 	for _, dt := range dts {
@@ -151,19 +155,22 @@ func (t *RestOrm) ResCreateMany(dbName, tbName string, dts ...map[string]interfa
 		errors.PanicMM(err, func(err *errors.Err) {
 			err.Msg("db create error")
 			err.M("input", dt)
-			err.M("dbName", dbName)
-			err.M("tbName", tbName)
+			err.M("db", dbName)
+			err.M("tb", tbName)
 			err.SetTag(ErrTag.DbCreateError)
 		})
 	}
-	errors.PanicM(_tx.Commit(), "tx commit error")
 
+	errors.PanicM(_tx.Commit, "tx commit error")
 	return
 }
 
-// 删除记录
+// 批量删除记录
 func (t *RestOrm) ResDeleteMany(dbName, tbName string, filter ...interface{}) (err error) {
 	defer errors.RespErr(&err)
+
+	// 检查db和tb
+	errors.Panic(t.checkDbAndTb(dbName, tbName))
 
 	_db := t.cfg[dbName].db
 	_sql := &sqlBuilder{table: tbName}
@@ -173,19 +180,22 @@ func (t *RestOrm) ResDeleteMany(dbName, tbName string, filter ...interface{}) (e
 	errors.PanicMM(err, func(err *errors.Err) {
 		err.Msg("db delete error")
 		err.M("input", filter)
-		err.M("dbName", dbName)
-		err.M("tbName", tbName)
+		err.M("db", dbName)
+		err.M("tb", tbName)
 		err.SetTag(ErrTag.DbDeleteError)
 	})
 
 	return
 }
 
-// 修改记录
+// 批量修改记录
 func (t *RestOrm) ResUpdateMany(dbName, tbName string, data map[string]interface{}, filter ...interface{}) (err error) {
 	defer errors.RespErr(&err)
 
-	errors.PanicT(_isNone(data), "update data is nil")
+	errors.PanicT(_isNone(data), "data is nil")
+
+	// 检查db和tb
+	errors.Panic(t.checkDbAndTb(dbName, tbName))
 
 	_db := t.cfg[dbName].db
 	_sql := &sqlBuilder{table: tbName}
@@ -195,8 +205,8 @@ func (t *RestOrm) ResUpdateMany(dbName, tbName string, data map[string]interface
 	errors.PanicMM(err, func(err *errors.Err) {
 		err.Msg("db update error")
 		err.M("input", filter)
-		err.M("dbName", dbName)
-		err.M("tbName", tbName)
+		err.M("db", dbName)
+		err.M("tb", tbName)
 		err.M("data", data)
 		err.SetTag(ErrTag.DbUpdateError)
 	})
@@ -204,8 +214,12 @@ func (t *RestOrm) ResUpdateMany(dbName, tbName string, data map[string]interface
 	return
 }
 
+// 过滤条件统计
 func (t *RestOrm) ResCount(dbName, tbName string, filter ...interface{}) (c int64, err error) {
 	defer errors.RespErr(&err)
+
+	// 检查db和tb
+	errors.Panic(t.checkDbAndTb(dbName, tbName))
 
 	_db := t.cfg[dbName].db
 	_sql := &sqlBuilder{table: tbName}
@@ -224,6 +238,9 @@ func (t *RestOrm) ResCount(dbName, tbName string, filter ...interface{}) (c int6
 func (t *RestOrm) rows2Map(dbName, tbName string, rows *sqlx.Rows) (res []map[string]interface{}, err error) {
 	defer errors.RespErr(&err)
 
+	// 检查db和tb
+	errors.Panic(t.checkDbAndTb(dbName, tbName))
+
 	var dts []map[string]interface{}
 	for rows.Next() {
 		dest := make(map[string]interface{})
@@ -236,11 +253,11 @@ func (t *RestOrm) rows2Map(dbName, tbName string, rows *sqlx.Rows) (res []map[st
 			values[i] = new(interface{})
 		}
 
-		_tb := t.cfg[dbName].colT[tbName]
+		_tb := t.cfg[dbName].tbs[tbName]
 		errors.Panic(rows.Scan(values...))
 		for i, column := range cons {
 			k := column.Name()
-			if _fn, ok := _tb[k]; ok {
+			if _fn, ok := _tb.ColT[k]; ok {
 				dest[k] = _fn.converter(values[i])
 			} else {
 				dest[k] = Converter(strings.ToLower(column.DatabaseTypeName()))(values[i])
@@ -253,9 +270,12 @@ func (t *RestOrm) rows2Map(dbName, tbName string, rows *sqlx.Rows) (res []map[st
 	return
 }
 
-// 查询
+// 过滤查询
 func (t *RestOrm) ResGetMany(dbName, tbName string, fields string, groupBy string, order string, limit, offset string, filter ...interface{}) (dts []map[string]interface{}, err error) {
 	defer errors.RespErr(&err)
+
+	// 检查db和tb
+	errors.Panic(t.checkDbAndTb(dbName, tbName))
 
 	_db := t.cfg[dbName].db
 	_sql := &sqlBuilder{table: tbName, fields: fields}
@@ -269,8 +289,8 @@ func (t *RestOrm) ResGetMany(dbName, tbName string, fields string, groupBy strin
 	errors.PanicMM(err, func(err *errors.Err) {
 		err.Msg("db get error")
 		err.M("input", filter)
-		err.M("dbName", dbName)
-		err.M("tbName", tbName)
+		err.M("db", dbName)
+		err.M("tb", tbName)
 		err.M("sql", _sql)
 		err.SetTag(ErrTag.DbGetError)
 	})
