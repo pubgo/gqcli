@@ -3,14 +3,14 @@ package restorm
 import "github.com/pubgo/g/errors"
 
 var ErrTag = struct {
-	DbCreateError    string `toml:"db_create_error"`
-	DbDeleteError    string `toml:"db_delete_error"`
-	DbUpdateError    string `toml:"db_update_error"`
-	DbCountError     string `toml:"db_count_error"`
-	DbGetError       string `toml:"db_get_error"`
-	DbDeleteOneError string `toml:"db_delete_one_error"`
-	DbUpdateOneError string `toml:"db_update_one_error"`
-	DbGetOneError    string `toml:"db_get_one_error"`
+	DbCreateError    string
+	DbDeleteError    string
+	DbUpdateError    string
+	DbCountError     string
+	DbGetError       string
+	DbDeleteOneError string
+	DbUpdateOneError string
+	DbGetOneError    string
 }{
 	DbCreateError:    "db_create_error",
 	DbDeleteError:    "db_delete_error",

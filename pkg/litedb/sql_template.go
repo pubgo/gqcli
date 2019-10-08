@@ -1,4 +1,4 @@
-package nqldb
+package litedb
 
 import (
 	"github.com/pubgo/g/errors"

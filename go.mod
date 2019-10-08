@@ -5,6 +5,8 @@ go 1.12
 require (
 	github.com/RoaringBitmap/roaring v0.4.20
 	github.com/couchbase/vellum v0.0.0-20190829182332-ef2e028c01fd // indirect
+	github.com/gin-contrib/cors v1.3.0
+	github.com/gin-contrib/logger v0.0.1
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-vgo/robotgo v0.0.0-20190913150959-399bd641cacc
 	github.com/google/uuid v1.1.1

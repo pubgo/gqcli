@@ -1,6 +1,9 @@
 package restorm
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	"github.com/pubgo/g/envs"
+)
 
 type converter struct {
 	Name      string
@@ -19,4 +22,8 @@ type Config struct {
 
 	db   *sqlx.DB
 	colT map[string]map[string]*converter
+}
+
+func init() {
+	Cfg.Debug = envs.IsDebug()
 }
