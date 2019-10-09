@@ -22,14 +22,16 @@ func _ToFloat(p string) float64 {
 
 func Converter(sqlType string) func(interface{}) interface{} {
 	return func(dt interface{}) interface{} {
+		_isNil := _isNone(dt)
+
 		switch sqlType {
 		case "tinyint", "int", "smallint", "mediumint", "bigint":
-			if _isNone(dt) {
+			if _isNil {
 				return 0
 			}
 
 			switch _v := dt.(type) {
-			case int, int64, int32, int16, int8, sql.NullInt64:
+			case int64, int32, int16, int8, int, sql.NullInt64:
 				return _v
 			case string:
 				return _ToInt(_v)
@@ -37,7 +39,7 @@ func Converter(sqlType string) func(interface{}) interface{} {
 				return big.NewInt(0).SetBytes(_v).Int64()
 			}
 		case "char", "enum", "varchar", "longtext", "mediumtext", "text", "tinytext":
-			if _isNone(dt) {
+			if _isNil {
 				return ""
 			}
 
@@ -50,7 +52,7 @@ func Converter(sqlType string) func(interface{}) interface{} {
 				return strconv.Itoa(_v)
 			}
 		case "date", "datetime", "time", "timestamp":
-			if _isNone(dt) {
+			if _isNil {
 				return time.Now()
 			}
 
@@ -67,7 +69,7 @@ func Converter(sqlType string) func(interface{}) interface{} {
 				return t
 			}
 		case "decimal", "double", "float":
-			if _isNone(dt) {
+			if _isNil {
 				return 0.0
 			}
 
@@ -81,7 +83,7 @@ func Converter(sqlType string) func(interface{}) interface{} {
 			}
 
 		case "binary", "blob", "longblob", "mediumblob", "varbinary":
-			if _isNone(dt) {
+			if _isNil {
 				return ""
 			}
 
