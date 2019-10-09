@@ -25,10 +25,10 @@ func App() *gin.Engine {
 			})
 		}
 		ctx.IndentedJSON(http.StatusOK, gin.H{
-			"routes":    rs,
-			"version":   version.Version,
-			"buildV":    version.BuildV,
-			"commitV":   version.CommitV,
+			"routes":  rs,
+			"version": version.Version,
+			"buildV":  version.BuildV,
+			"commitV": version.CommitV,
 		})
 	})
 

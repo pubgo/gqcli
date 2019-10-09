@@ -1,0 +1,33 @@
+### Get request with parameter
+GET http://localhost:8080/db2rest/ping
+
+### Send POST request with json body
+POST http://localhost:8080/db2rest/api/v1/rds/mydb/a1
+Content-Type: application/json
+
+[
+  {
+    "a1": "content"
+  },
+  {
+    "a1": "content1"
+  },
+  {
+    "a1": "content2"
+  },
+  {
+    "a1": "content3"
+  }
+]
+
+### Send POST request with json body
+DELETE http://localhost:8080/db2rest/api/v1/rds/mydb/a1?a1=null
+
+### Get request with parameter
+GET http://localhost:8080/db2rest/api/v1/rds/mydb/a1?$order=~a1
+
+### s POST
+GET http://localhost:8080/db2rest/api/v1/rds/mydb/a1?$groupBy=a1&$fields=count(a1) as c,max(id) as d&$limit=2
+
+###
+

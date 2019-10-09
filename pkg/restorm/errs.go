@@ -2,6 +2,7 @@ package restorm
 
 import "github.com/pubgo/g/errors"
 
+// ErrTag is error tags
 var ErrTag = struct {
 	DbCreateError    string
 	DbDeleteError    string

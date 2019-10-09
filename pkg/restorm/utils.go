@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"bytes"
 	"database/sql"
-	"github.com/pubgo/g/errors"
 	"io"
 	"strings"
+
+	"github.com/pubgo/g/errors"
 )
 
 //Import SQL DDL from sql file
-func (t *RestOrm) Import(name string, f io.Reader) (res []sql.Result, err error) {
+func (t *restOrm) Import(name string, f io.Reader) (res []sql.Result, err error) {
 	defer errors.RespErr(&err)
 
 	scanner := bufio.NewScanner(f)

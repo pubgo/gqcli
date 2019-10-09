@@ -18,25 +18,23 @@ type sqlBuilder struct {
 	args       []interface{}
 }
 
-func (s *sqlBuilder) limitFormat() string {
-	if s.limit != "" {
-		return "LIMIT " + s.limit
-	}
-	return ""
+func (s *sqlBuilder) limitFormat() interface{} {
+	return _if(s.limit != "", "LIMIT "+s.limit, "")
 }
 
-func (s *sqlBuilder) offsetFormat() string {
-	if s.offset != "" {
-		return "OFFSET " + s.offset
-	}
-	return ""
+func (s *sqlBuilder) offsetFormat() interface{} {
+	return _if(s.offset != "", "OFFSET "+s.offset, "")
 }
 
 func (s *sqlBuilder) orderFormat() string {
-	if s.orderBy != "" {
-		return "ORDER BY " + s.orderBy
+	if s.orderBy == "" {
+		return ""
 	}
-	return ""
+
+	if strings.Contains(s.orderBy, "~") {
+		s.orderBy = strings.Trim(s.orderBy, "~") + " DESC "
+	}
+	return "ORDER BY " + s.orderBy
 }
 
 func (s *sqlBuilder) _table() string {
@@ -47,11 +45,8 @@ func (s *sqlBuilder) _table() string {
 	return table
 }
 
-func (s *sqlBuilder) groupFormat() string {
-	if s.groupBy != "" {
-		return "GROUP BY " + s.groupBy
-	}
-	return ""
+func (s *sqlBuilder) groupFormat() interface{} {
+	return _if(s.groupBy != "", "GROUP BY "+s.groupBy, "")
 }
 
 //queryString Assemble the query statement
@@ -59,7 +54,7 @@ func (s *sqlBuilder) queryString() string {
 	if s.fields == "" {
 		s.fields = "*"
 	}
-	return fmt.Sprintf("%sSELECT %s FROM %s %s %s %s %s %s;", s.hint, s.fields, s._table(), s.where, s.groupFormat(), s.orderFormat(), s.limitFormat(), s.offsetFormat())
+	return fmt.Sprintf("%s SELECT %s FROM %s %s %s %s %s %s;", s.hint, s.fields, s._table(), s.where, s.groupFormat(), s.orderFormat(), s.limitFormat(), s.offsetFormat())
 }
 
 //countString Assemble the count statement

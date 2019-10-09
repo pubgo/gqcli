@@ -3,53 +3,33 @@ package restorm
 import (
 	"database/sql"
 	"fmt"
+	"github.com/pubgo/mycli/pkg/logs"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pubgo/g/errors"
-	"github.com/pubgo/schema"
 )
 
 var once sync.Once
-var _db *RestOrm
+var _db *restOrm
 
-func Default() *RestOrm {
+// Default is default RestOrm instance
+func Default() IRestOrm {
 	once.Do(func() {
-		_db = &RestOrm{
+		_db = &restOrm{
 			cfg: make(map[string]*Config),
 		}
 	})
 	return _db
 }
 
-type RestOrm struct {
+type restOrm struct {
 	cfg map[string]*Config
 }
 
-// colsTransfer get table field name and type
-func (t *RestOrm) colsTransfer(name string, cfg *Config) (err error) {
-	defer errors.RespErr(&err)
-
-	tbs, err := schema.Tables(cfg.db.DB)
-	errors.PanicM(err, "get table schema error")
-
-	if cfg.tbs == nil {
-		cfg.tbs = make(map[string]*tb)
-	}
-
-	for name, tps := range tbs {
-		cfg.tbs[name] = &tb{ColT: make(map[string]*converter)}
-		for _, f := range tps {
-			fieldTp := strings.ToLower(f.DatabaseTypeName())
-			cfg.tbs[name].ColT[f.Name()] = &converter{TpName: fieldTp, converter: Converter(fieldTp)}
-		}
-	}
-	return
-}
-
-func (t *RestOrm) DbStats() map[string]sql.DBStats {
+func (t *restOrm) DbStats() map[string]sql.DBStats {
 	stats := make(map[string]sql.DBStats)
 	for k, v := range t.cfg {
 		stats[k] = v.db.Stats()
@@ -57,129 +37,122 @@ func (t *RestOrm) DbStats() map[string]sql.DBStats {
 	return stats
 }
 
-func (t *RestOrm) ColTs() map[string]map[string]map[string]string {
-	var dt = make(map[string]map[string]map[string]string)
-	for k, v := range t.cfg {
-		dt[k] = make(map[string]map[string]string)
-		for k1, v1 := range v.tbs {
-			dt[k][k1] = make(map[string]string)
-			for k2, v := range v1.ColT {
-				dt[k][k1][k2] = v.TpName
-			}
-		}
-	}
-	return dt
-}
-
-func (t *RestOrm) dbConnect(key string, conf *Config) (err error) {
+func (t *restOrm) dbConnect(dbName string, cfg *Config) (err error) {
 	defer errors.RespErr(&err)
 
-	if !conf.Enable {
+	if !cfg.Enable {
+		if _l := logger.Warn(); _l.Enabled() {
+			_l.Msgf("db %s is not enable", dbName)
+		}
 		return
 	}
 
-	db, err := sqlx.Connect(conf.Driver, conf.Dsn)
-	errors.PanicM(err, "%s connect error", conf.Dsn)
-	errors.PanicM(db.Ping(), "ping error")
+	db, err := sqlx.Connect(cfg.Driver, cfg.Dsn)
+	errors.PanicM(err, "%s connect error", cfg.Dsn)
+	errors.PanicM(db.Ping(), "%s ping error", dbName)
 
-	db.SetMaxOpenConns(conf.MaxOpenConns)
-	db.SetMaxIdleConns(conf.MaxIdleConns)
-	if conf.MaxLifetime > 0 {
-		db.SetConnMaxLifetime(time.Duration(conf.MaxLifetime) * time.Second)
+	if cfg.MaxOpenConns > 0 {
+		db.SetMaxOpenConns(cfg.MaxOpenConns)
 	}
-	conf.db = db
 
-	errors.Panic(t.colsTransfer(key, conf))
+	if cfg.MaxIdleConns > 0 {
+		db.SetMaxIdleConns(cfg.MaxIdleConns)
+	}
+
+	if cfg.MaxLifetime > 0 {
+		db.SetConnMaxLifetime(time.Duration(cfg.MaxLifetime) * time.Second)
+	}
+	cfg.db = db
 	return
 }
 
-func (t *RestOrm) DbConfigAdd(name string, cfg *Config) {
+func (t *restOrm) DbAdd(dbName string, cfg *Config) {
 	_retryAt(time.Second, func(dur time.Duration) {
-		errors.PanicM(t.dbConnect(name, cfg), "db connect error")
-		t.cfg[name] = cfg
+		errors.PanicM(t.dbConnect(dbName, cfg), "db(%s) connect error", dbName)
+		t.cfg[dbName] = cfg
 	})
 }
 
-func (t *RestOrm) DbConfigDelete(name string) {
-	if db, ok := t.cfg[name]; ok {
+func (t *restOrm) DbDelete(dbName string) {
+	if db, ok := t.cfg[dbName]; ok {
 		_retryAt(time.Second, func(dur time.Duration) {
-			errors.PanicM(db.db.Close, "db(%s) closed error", name)
-			delete(t.cfg, name)
+			errors.PanicM(db.db.Close, "db(%s) closed error", dbName)
+			delete(t.cfg, dbName)
 		})
 	}
 }
 
 // DbUpdate 更新字段和类型
-func (t *RestOrm) DbUpdate(name string) (err error) {
-	defer errors.RespErr(&err)
-
-	cfg, ok := t.cfg[name]
-	errors.PanicT(!ok, "db(%s) does not exist", name)
-	errors.Panic(t.colsTransfer(name, cfg))
-	t.cfg[name] = cfg
-	return
-}
-
-func (t *RestOrm) DbConfigUpdate(name string, cfg *Config) {
-	t.DbConfigDelete(name)
-	t.DbConfigAdd(name, cfg)
+func (t *restOrm) DbUpdate(dbName string, cfg *Config) {
+	t.DbDelete(dbName)
+	t.DbAdd(dbName, cfg)
 }
 
 // 检查数据库名称和数据表名
-func (t *RestOrm) checkDbAndTb(dbName, tbName string) error {
-	db := t.cfg[dbName]
-	if db == nil || db.tbs[tbName] == nil {
+func (t *restOrm) checkDbAndTb(dbName, tbName string) error {
+	if t.cfg[dbName] == nil {
 		return fmt.Errorf("db name or table name does not exist,(%s, %s)", dbName, tbName)
 	}
 	return nil
 }
 
 // 批量创建记录
-func (t *RestOrm) ResCreateMany(dbName, tbName string, dts ...map[string]interface{}) (err error) {
+func (t *restOrm) ResCreateMany(dbName, tbName string, dts ...map[string]interface{}) (err error) {
 	defer errors.RespErr(&err)
 
 	// 检查db和tb
 	errors.Panic(t.checkDbAndTb(dbName, tbName))
 
-	_db := t.cfg[dbName].db
-	_tx, err := _db.Beginx()
+	_cfg := t.cfg[dbName]
+	_tx, err := _cfg.db.Beginx()
 	errors.PanicM(err, "db(%s) create tx error", dbName)
 
 	_sql := &sqlBuilder{table: tbName}
 	for _, dt := range dts {
-		_, err := _tx.Exec(_sql.insertString(dt), _sql.args...)
+		_sqlData := _sql.insertString(dt)
+		if _cfg.ShowSQL {
+			logs.P("_sqlData", _sql.args)
+		}
+
+		_, err := _tx.Exec(_sqlData, _sql.args...)
 		if err != nil {
-			errors.PanicM(_tx.Rollback, "tx rollback error: %s", err)
+			errors.PanicM(_tx.Rollback(), "tx rollback error: %s", err)
 		}
 
 		errors.PanicMM(err, func(err *errors.Err) {
 			err.Msg("db create error")
 			err.M("input", dt)
+			err.M("sql", _sqlData)
 			err.M("db", dbName)
 			err.M("tb", tbName)
 			err.SetTag(ErrTag.DbCreateError)
 		})
 	}
 
-	errors.PanicM(_tx.Commit, "tx commit error")
+	errors.PanicM(_tx.Commit(), "tx commit error")
 	return
 }
 
 // 批量删除记录
-func (t *RestOrm) ResDeleteMany(dbName, tbName string, filter ...interface{}) (err error) {
+func (t *restOrm) ResDeleteMany(dbName, tbName string, where ...interface{}) (err error) {
 	defer errors.RespErr(&err)
 
 	// 检查db和tb
 	errors.Panic(t.checkDbAndTb(dbName, tbName))
 
-	_db := t.cfg[dbName].db
+	_cfg := t.cfg[dbName]
 	_sql := &sqlBuilder{table: tbName}
-	_sql.Where(filter...)
+	_sql.Where(where...)
 
-	_, err = _db.Exec(_sql.deleteString(), _sql.args...)
+	_sqlData := _sql.deleteString()
+	if _cfg.ShowSQL {
+		logs.P("_sqlData", _sql.args)
+	}
+
+	_, err = _cfg.db.Exec(_sqlData, _sql.args...)
 	errors.PanicMM(err, func(err *errors.Err) {
 		err.Msg("db delete error")
-		err.M("input", filter)
+		err.M("sql", _sqlData)
 		err.M("db", dbName)
 		err.M("tb", tbName)
 		err.SetTag(ErrTag.DbDeleteError)
@@ -189,7 +162,7 @@ func (t *RestOrm) ResDeleteMany(dbName, tbName string, filter ...interface{}) (e
 }
 
 // 批量修改记录
-func (t *RestOrm) ResUpdateMany(dbName, tbName string, data map[string]interface{}, filter ...interface{}) (err error) {
+func (t *restOrm) ResUpdateMany(dbName, tbName string, data map[string]interface{}, where ...interface{}) (err error) {
 	defer errors.RespErr(&err)
 
 	errors.PanicT(_isNone(data), "data is nil")
@@ -197,14 +170,19 @@ func (t *RestOrm) ResUpdateMany(dbName, tbName string, data map[string]interface
 	// 检查db和tb
 	errors.Panic(t.checkDbAndTb(dbName, tbName))
 
-	_db := t.cfg[dbName].db
+	_cfg := t.cfg[dbName]
 	_sql := &sqlBuilder{table: tbName}
-	_sql.Where(filter...)
+	_sql.Where(where...)
 
-	_, err = _db.Exec(_sql.updateString(data), _sql.args...)
+	_sqlData := _sql.updateString(data)
+	if _cfg.ShowSQL {
+		logs.P("_sqlData", _sql.args)
+	}
+
+	_, err = _cfg.db.Exec(_sqlData, _sql.args...)
 	errors.PanicMM(err, func(err *errors.Err) {
 		err.Msg("db update error")
-		err.M("input", filter)
+		err.M("sql", _sqlData)
 		err.M("db", dbName)
 		err.M("tb", tbName)
 		err.M("data", data)
@@ -215,19 +193,24 @@ func (t *RestOrm) ResUpdateMany(dbName, tbName string, data map[string]interface
 }
 
 // 过滤条件统计
-func (t *RestOrm) ResCount(dbName, tbName string, filter ...interface{}) (c int64, err error) {
+func (t *restOrm) ResCount(dbName, tbName string, where ...interface{}) (c int64, err error) {
 	defer errors.RespErr(&err)
 
 	// 检查db和tb
 	errors.Panic(t.checkDbAndTb(dbName, tbName))
 
-	_db := t.cfg[dbName].db
+	_cfg := t.cfg[dbName]
 	_sql := &sqlBuilder{table: tbName}
-	_sql.Where(filter...)
+	_sql.Where(where...)
 
-	errors.PanicMM(_db.Select(&c, _sql.countString(), _sql.args...), func(err *errors.Err) {
+	_sqlData := _sql.countString()
+	if _cfg.ShowSQL {
+		logs.P(_sqlData, _sql.args)
+	}
+
+	errors.PanicMM(_cfg.db.Select(&c, _sqlData, _sql.args...), func(err *errors.Err) {
 		err.Msg("db count error")
-		err.M("input", filter)
+		err.M("sql", _sqlData)
 		err.M("dbName", dbName)
 		err.M("tbName", tbName)
 		err.SetTag(ErrTag.DbCountError)
@@ -235,63 +218,93 @@ func (t *RestOrm) ResCount(dbName, tbName string, filter ...interface{}) (c int6
 	return
 }
 
-func (t *RestOrm) rows2Map(dbName, tbName string, rows *sqlx.Rows) (res []map[string]interface{}, err error) {
+func (t *restOrm) rows2Map(dbName, tbName string, rows *sqlx.Rows) (dts []map[string]interface{}, err error) {
 	defer errors.RespErr(&err)
 
-	// 检查db和tb
-	errors.Panic(t.checkDbAndTb(dbName, tbName))
-
-	var dts []map[string]interface{}
 	for rows.Next() {
 		dest := make(map[string]interface{})
 
 		cons, err := rows.ColumnTypes()
-		errors.Panic(err)
+		errors.PanicM(err, "get rows column types error")
 
 		values := make([]interface{}, len(cons))
-		for i := range values {
-			values[i] = new(interface{})
+		for i, con := range cons {
+			switch strings.ToLower(con.DatabaseTypeName()) {
+			case "tinyint", "int", "smallint", "mediumint", "bigint", "integer":
+				values[i] = new(sql.NullInt64)
+			case "char", "enum", "varchar", "longtext", "mediumtext", "text", "tinytext":
+				values[i] = new(sql.NullString)
+			case "date", "datetime", "time", "timestamp":
+				values[i] = new(time.Time)
+			case "decimal", "double", "float":
+				values[i] = new(sql.NullFloat64)
+			case "binary", "blob", "longblob", "mediumblob", "varbinary":
+				values[i] = new(sql.NullString)
+			case "bool":
+				values[i] = new(sql.NullBool)
+			case "":
+				switch con.ScanType().Name() {
+				case "int64", "int32", "int":
+					values[i] = new(sql.NullInt64)
+				case "float64", "float32":
+					values[i] = new(sql.NullFloat64)
+				case "string":
+					values[i] = new(sql.NullString)
+				}
+			default:
+				errors.PanicT(true, "unknown type")
+			}
 		}
 
-		_tb := t.cfg[dbName].tbs[tbName]
-		errors.Panic(rows.Scan(values...))
+		errors.PanicM(rows.Scan(values...), "rows scan error")
 		for i, column := range cons {
-			k := column.Name()
-			if _fn, ok := _tb.ColT[k]; ok {
-				dest[k] = _fn.converter(values[i])
-			} else {
-				dest[k] = Converter(strings.ToLower(column.DatabaseTypeName()))(values[i])
+			colN := column.Name()
+			switch _v := values[i].(type) {
+			case *sql.NullFloat64:
+				dest[colN] = _v.Float64
+			case *sql.NullString:
+				dest[colN] = _v.String
+			case *sql.NullInt64:
+				dest[colN] = _v.Int64
+			case *time.Time:
+				dest[colN] = _v.Unix()
+			case *sql.NullBool:
+				dest[colN] = _v.Bool
+			default:
+				errors.PanicT(true, "unknown type")
 			}
 		}
 		dts = append(dts, dest)
 	}
-
-	res = dts
 	return
 }
 
 // 过滤查询
-func (t *RestOrm) ResGetMany(dbName, tbName string, fields string, groupBy string, order string, limit, offset string, filter ...interface{}) (dts []map[string]interface{}, err error) {
+func (t *restOrm) ResGetMany(dbName, tbName string, fields string, groupBy string, order string, limit, offset string, where ...interface{}) (dts []map[string]interface{}, err error) {
 	defer errors.RespErr(&err)
 
 	// 检查db和tb
 	errors.Panic(t.checkDbAndTb(dbName, tbName))
 
-	_db := t.cfg[dbName].db
+	_cfg := t.cfg[dbName]
 	_sql := &sqlBuilder{table: tbName, fields: fields}
 	_sql.groupBy = groupBy
 	_sql.orderBy = order
 	_sql.limit = limit
 	_sql.offset = offset
-	_sql.Where(filter...)
+	_sql.Where(where...)
 
-	rows, err := _db.Queryx(_sql.queryString(), _sql.args...)
+	_sqlData := _sql.queryString()
+	if t.cfg[dbName].ShowSQL {
+		logs.P(_sqlData, _sql.args)
+	}
+
+	rows, err := _cfg.db.Queryx(_sqlData, _sql.args...)
 	errors.PanicMM(err, func(err *errors.Err) {
 		err.Msg("db get error")
-		err.M("input", filter)
+		err.M("sql", _sqlData)
 		err.M("db", dbName)
 		err.M("tb", tbName)
-		err.M("sql", _sql)
 		err.SetTag(ErrTag.DbGetError)
 	})
 
