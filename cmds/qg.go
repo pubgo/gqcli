@@ -1,8 +1,12 @@
 package cmds
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/pubgo/g/gcmds"
+	"github.com/spf13/cobra"
+)
 
 func init() {
+	rootCmd := gcmds.Default()
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "gq",
 		Short: "mycli gq",

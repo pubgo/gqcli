@@ -2,6 +2,7 @@ package cmds
 
 import (
 	"fmt"
+	"github.com/pubgo/g/gcmds"
 	"github.com/spf13/cobra"
 	"log"
 	"net"
@@ -24,6 +25,7 @@ func (f *sHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
+	rootCmd := gcmds.Default()
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "ss",
 		Short: "mycli simple server",

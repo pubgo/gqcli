@@ -3,6 +3,7 @@ package cmds
 import (
 	"bytes"
 	"github.com/pubgo/g/errors"
+	"github.com/pubgo/g/gcmds"
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"net/http"
@@ -23,6 +24,7 @@ func init() {
 		PageSize int
 	}
 
+	rootCmd := gcmds.Default()
 	// https://turing.yuanben.site/extract_rules/api/rule/list?page={{.Page}}&limit={{.PageSize}}
 	rootCmd.AddCommand(func(cmd *cobra.Command) *cobra.Command {
 		cmd.Flags().StringVar(&url, "url", url, "抓取的url")

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"github.com/pubgo/g/errors"
 	"github.com/pubgo/mycli/cmds"
 	"os"
 )
 
 func main() {
-	cmds.Execute("MY", os.ExpandEnv("$PWD"))
+	defer errors.Debug()
+	errors.Panic(cmds.Execute("MY", os.ExpandEnv("$PWD")))
 }

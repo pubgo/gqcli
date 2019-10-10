@@ -3,6 +3,7 @@ package cmds
 import (
 	"fmt"
 	"github.com/pubgo/g/errors"
+	"github.com/pubgo/g/gcmds"
 	"github.com/pubgo/g/gotry"
 	"github.com/spf13/cobra"
 	"time"
@@ -13,6 +14,7 @@ func init() {
 	var retryAt = gotry.RetryAt
 	var n = 1
 
+	rootCmd := gcmds.Default()
 	rootCmd.AddCommand(func(cmd *cobra.Command) *cobra.Command {
 		cmd.Flags().IntVar(&n, "n", n, "生成UUID的数量")
 

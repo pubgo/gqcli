@@ -2,6 +2,7 @@ package cmds
 
 import (
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/pubgo/g/gcmds"
 	"github.com/pubgo/mycli/internal/dbless/rest"
 	"github.com/pubgo/mycli/pkg/logs"
 	"github.com/pubgo/mycli/pkg/restorm"
@@ -9,6 +10,7 @@ import (
 )
 
 func init() {
+	rootCmd := gcmds.Default()
 	rootCmd.AddCommand(func(cmd *cobra.Command) *cobra.Command {
 		return cmd
 	}(&cobra.Command{
