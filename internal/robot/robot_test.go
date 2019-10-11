@@ -5,6 +5,7 @@ import (
 	"github.com/go-vgo/robotgo"
 	"github.com/go-vgo/robotgo/clipboard"
 	"github.com/pubgo/g/errors"
+	hook "github.com/robotn/gohook"
 	"log"
 	"testing"
 	"time"
@@ -111,7 +112,7 @@ func click() {
 
 func toggleAndScroll() {
 	// scrolls the mouse either up
-	robotgo.ScrollMouse(1, "down")
+	robotgo.ScrollMouse(2, "down")
 
 	//for i:=0;i<2;i++{
 	robotgo.Scroll(0, 10)
@@ -182,6 +183,11 @@ func bitmaps() {
 	fmt.Println("FindBitmap------ ", x, fx/2, y, fy1/2)
 }
 
+// 测试选中
+func xuanzhong() {
+	//s := robotgo.Start()
+	//defer robotgo.End()
+}
 func TestA1(t *testing.T) {
 	//nps, err := robotgo.Process()
 	//errors.Panic(err)
@@ -214,7 +220,39 @@ func TestA1(t *testing.T) {
 
 	_ii := 0
 
-	for {
+	// 开始事件监听
+	s := robotgo.Start()
+	defer robotgo.End()
+
+	go func() {
+		fmt.Println(robotgo.AddEvents("s", "command"))
+	}()
+
+	go func() {
+		a := 0
+		for e := range s {
+			//fmt.Println(e.String())
+			//fmt.Println(e.Keycode, e.Keychar)
+
+			if e.Kind == hook.MouseDown {
+				a += int(hook.MouseDown) * int(hook.MouseDown)
+			}
+
+			if e.Kind == hook.MouseUp {
+				a += int(hook.MouseUp) * int(hook.MouseUp)
+			}
+
+			if a == 100 {
+				fmt.Println(e.String())
+				a = 0
+			}
+
+			//robotgo.ShowAlert("sss", "dd")
+			//robotgo.TypeString("okkkkk")
+		}
+	}()
+
+	for i := 0; i < 100000; i++ {
 
 		if _ii == 0 {
 			_ii = 4
@@ -227,8 +265,8 @@ func TestA1(t *testing.T) {
 		//robotgo.Scroll(0, gzhListStep)
 
 		// 获取当前的坐标
-		x, y := robotgo.GetMousePos()
-		fmt.Println(x, y)
+		//x, y := robotgo.GetMousePos()
+		//fmt.Println(x, y)
 
 		//robotgo.MoveMouse(int(gzhFirstList.X), int(gzhFirstList.Y)+105)
 		//robotgo.MouseToggle("down")
@@ -237,9 +275,21 @@ func TestA1(t *testing.T) {
 
 		//bitmaps()
 
-		toggleAndScroll()
+		//fmt.Println("history")
+		//fmt.Println(robotgo.GetMousePos())
+		//fmt.Println(robotgo.FindPic("/Users/barry/gopath/src/github.com/pubgo/mycli/internal/robot/history.png"))
 
-		time.Sleep(time.Millisecond * 500)
+		//robotgo.SaveCapture("a")
+		//robotgo.SaveCapture()
+
+		//x, y := robotgo.GetMousePos()
+		//bitmap1 := robotgo.CaptureScreen(x, y, 60, 15)
+		//defer robotgo.FreeBitmap(bitmap1)
+		//robotgo.SaveBitmap(bitmap1, "test.png")
+
+		//toggleAndScroll()
+
+		time.Sleep(time.Millisecond * 10000)
 		//fmt.Println(robotgo.IsValid())
 		//fmt.Println(robotgo.GetActive())
 		//fmt.Println(robotgo.FindNames())
