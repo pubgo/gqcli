@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/go-vgo/robotgo"
 	"github.com/go-vgo/robotgo/clipboard"
-	"github.com/pubgo/errors"
+	"github.com/pubgo/g/errors"
 	"log"
 	"testing"
 	"time"
@@ -111,9 +111,11 @@ func click() {
 
 func toggleAndScroll() {
 	// scrolls the mouse either up
-	robotgo.ScrollMouse(100, "down")
+	robotgo.ScrollMouse(1, "down")
 
-	robotgo.Scroll(100, 200)
+	//for i:=0;i<2;i++{
+	robotgo.Scroll(0, 10)
+	//}
 
 	// toggles right mouse button
 	//robotgo.MouseToggle("down", "right")
@@ -157,6 +159,27 @@ func mouse() {
 
 	toggleAndScroll()
 	fmt.Println("toggleAndScroll")
+}
+
+func bitmaps() {
+	x, y := robotgo.GetMousePos()
+	bitmap := robotgo.CaptureScreen(x, y, 1000, 1)
+	// use `defer robotgo.FreeBitmap(bit)` to free the bitmap
+	defer robotgo.FreeBitmap(bitmap)
+
+	//fmt.Println("...", bitmap)
+
+	fx, fy := robotgo.FindBitmap(bitmap)
+
+	bitmap1 := robotgo.CaptureScreen(x, y, 1, 1000)
+	defer robotgo.FreeBitmap(bitmap1)
+
+	// 把bitmap转化为str 然后再转化为bitmap
+	bitmap1 = robotgo.BitmapStr(robotgo.TostringBitmap(bitmap1))
+
+	fx1, fy1 := robotgo.FindBitmap(bitmap1)
+	fmt.Println("FindBitmap------ ", x, fx, fx1, y, fy, fy1)
+	fmt.Println("FindBitmap------ ", x, fx/2, y, fy1/2)
 }
 
 func TestA1(t *testing.T) {
@@ -212,9 +235,11 @@ func TestA1(t *testing.T) {
 		//robotgo.DragMouse(int(gzhFirstList.X), int(gzhFirstList.Y))
 		//robotgo.MouseToggle("up")
 
+		//bitmaps()
+
 		toggleAndScroll()
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 500)
 		//fmt.Println(robotgo.IsValid())
 		//fmt.Println(robotgo.GetActive())
 		//fmt.Println(robotgo.FindNames())
