@@ -30,4 +30,6 @@ graphquery cli
     https://github.com/TruthHun/html2json
 18. 系统弹窗练习
     https://github.com/sqweek/dialog
+    https://github.com/gen2brain/beeep
+    https://github.com/tawesoft/dialog
 
