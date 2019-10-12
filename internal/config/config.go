@@ -25,11 +25,6 @@ func (t *config) InitCfg() {
 	t.Debug = envs.IsDebug()
 	t.Env = envs.Cfg.Env
 
-	t.LogLevel = t.Cfg.Log.Level
-	if _l, ok := os.LookupEnv("log_level"); ok {
-		t.LogLevel = _l
-		errors.PanicT(!logs.Match(t.LogLevel), "the env value is not match,value(%s)", _l)
-	}
 	if _d := viper.Get("ll"); _d != nil {
 		t.LogLevel = viper.GetString("ll")
 		errors.PanicT(!logs.Match(t.LogLevel), "the env value is not match,value(%s)", t.LogLevel)

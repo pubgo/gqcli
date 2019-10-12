@@ -15,8 +15,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0
 	github.com/olekukonko/tablewriter v0.0.1
-	github.com/pubgo/errors v0.3.13
-	github.com/pubgo/g v0.1.6
+	github.com/pubgo/g v0.1.9
 	github.com/robotn/gohook v0.0.0-20190905174353-5bea7a10cc3a
 	github.com/rs/zerolog v1.15.0
 	github.com/spf13/cobra v0.0.5
