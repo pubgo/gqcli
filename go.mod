@@ -10,9 +10,10 @@ require (
 	github.com/gin-contrib/logger v0.0.1
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-vgo/robotgo v0.0.0-20190913150959-399bd641cacc
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/google/uuid v1.1.1
 	github.com/jmoiron/sqlx v1.2.0
+	github.com/lifei6671/gocaptcha v0.0.0-20190301083731-c467a25bc100
 	github.com/mafredri/cdp v0.24.2 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0
@@ -28,4 +29,5 @@ require (
 	github.com/yanyiwu/gojieba v1.1.0
 	github.com/yuin/charsetutil v1.0.0 // indirect
 	github.com/zserge/webview v0.0.0-20190123072648-16c93bcaeaeb
+	golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a
 )
