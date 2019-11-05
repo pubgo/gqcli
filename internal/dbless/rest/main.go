@@ -14,6 +14,8 @@ func App() *gin.Engine {
 	r.Use(cors.Default())
 	r.Use(logger.SetLogger())
 
+	r.StaticFile("/favicon.ico", "favicon.ico")
+
 	app := r.Group("/db2rest")
 	app.GET("/", func(ctx *gin.Context) {
 		var rs []gin.H
