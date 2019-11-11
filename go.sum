@@ -242,6 +242,7 @@ github.com/pubgo/g v0.1.6 h1:pxXV5uNcxQmKM3HvSyQJUPePnsgerqZitv5QqAl+Tac=
 github.com/pubgo/g v0.1.6/go.mod h1:v7LVhBmpcoQYUxbpFjVnK+p0995q39KpjnPmVnvxZAU=
 github.com/pubgo/g v0.1.9 h1:UrMJzYBC+0izhjpsqIZCc0gEknLPscsoqyqn1TGH530=
 github.com/pubgo/g v0.1.9/go.mod h1:v7LVhBmpcoQYUxbpFjVnK+p0995q39KpjnPmVnvxZAU=
+github.com/pubgo/g v0.1.20 h1:VrdfqWt93ZghWu6TiTaf7+O1kdiDHVYxx3+eUMEw3y0=
 github.com/pubgo/schema v0.0.3 h1:lxGlQ8KAhk77U2xFU4y2IoWBskNrPuznzE6yC0npg9Y=
 github.com/pubgo/schema v0.0.3/go.mod h1:e8SCXfgwde8aYI64tC+L/NHAutcBgGeHI7Le96EZQ78=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
@@ -321,6 +322,8 @@ github.com/yuin/charsetutil v1.0.0/go.mod h1:l9Fjvlj42gWS8XJ4Ht2KdYL/2qduX/KsQHu
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 github.com/zserge/webview v0.0.0-20190123072648-16c93bcaeaeb h1:zVjnyZIM7UtkG3dNckiudIm+TUHkZqi5xlVQPd3J6/c=
 github.com/zserge/webview v0.0.0-20190123072648-16c93bcaeaeb/go.mod h1:a1CV8KR4Dd1eP2g+mEijGOp+HKczwdKHWyx0aPHKvo4=
+github.com/zserge/webview v0.0.0-20191103184548-1a9ebffc2601 h1:64QY2+QvOmOMbcCU3cyn7T+4Af0RehxMfedEwarpV1Y=
+github.com/zserge/webview v0.0.0-20191103184548-1a9ebffc2601/go.mod h1:a1CV8KR4Dd1eP2g+mEijGOp+HKczwdKHWyx0aPHKvo4=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.opencensus.io v0.20.1/go.mod h1:6WKK9ahsWS3RSO+PY9ZHZUfv2irvY6gN279GOPZjmmk=
 go.uber.org/atomic v1.4.0/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=

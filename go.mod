@@ -28,7 +28,7 @@ require (
 	github.com/ugorji/go v1.1.7 // indirect
 	github.com/yanyiwu/gojieba v1.1.0
 	github.com/yuin/charsetutil v1.0.0 // indirect
-	github.com/zserge/webview v0.0.0-20190123072648-16c93bcaeaeb
+	github.com/zserge/webview v0.0.0-20191103184548-1a9ebffc2601
 	golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a
 	gopkg.in/tylerb/graceful.v1 v1.2.15
 )
